@@ -1,0 +1,33 @@
+{% extends './index.html' %}
+{% block body %}
+    <div class="registro" style="margin: 0 auto;">
+        <h3 class="text-center fw-bold">Registro de Usuario</h3>
+        <form action="/registro" class="w-50 was-validated" style="margin: 0 auto;" method="post">
+            <div class="mb-3">
+                <label for="txtUser" class="fw-bold">Usuario:</label>
+                <input type="text" name="txtUser" id="txtUser" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtPassword" class="fw-bold">Contraseña:</label>
+                <input type="password" name="txtPassword" id="txtPassword" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtNombres" class="fw-bold">Nombres:</label>
+                <input type="text" name="txtNombres" id="txtNombres" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtApellidos" class="fw-bold">Apellidos:</label>
+                <input type="text" name="txtApellidos" id="txtApellidos" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtCorreo" class="fw-bold">Correo Electrónico:</label>
+                <input type="email" name="txtCorreo" id="txtCorreo" class="form-control" required>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+                <a href="/iniciarSesion" class="btn btn-secondary" method="GET">Cancelar</a>
+
+            </div>
+        </form>
+    </div>
+{% endblock %}

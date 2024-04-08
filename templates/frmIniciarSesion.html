@@ -1,0 +1,25 @@
+{% extends './index.html' %}
+{% block body %}
+    <div class="iniciarSesion" style="margin:0 auto" >
+        <h3 class="text-center fw-bold">Iniciar Sesion</h3> <!-- Corregido el título -->
+        <form action="/iniciarSesion" class="w-50 was-validated" style="margin: 0 auto;" method="post">
+            <div class="mb-3">
+                <label for="txtUser" class="fw-bold">Usuario:</label>
+                <input type="text" name="txtUser" id="txtUser"  class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtPassword" class="fw-bold">Password:</label>
+                <input type="password" name="txtPassword" id="txtPassword" 
+                class="form-control" required>
+            </div>
+            <div>
+                <button class="btn btn-success">Ingresar</button>
+                <a href="/iniciarSesion"><button class="btn btn-secondary">Cancelar</button></a> 
+                <a href="/registro" class="btn btn-primary">Registrarse</a>
+            </div>
+        </form>
+    </div>
+    {% if mensaje %}
+        <script> swal.fire('Iniciar Sesión', '{{mensaje}}', 'info')</script> <!-- Corregido el título en el mensaje de alerta -->
+    {% endif %}
+{% endblock %}

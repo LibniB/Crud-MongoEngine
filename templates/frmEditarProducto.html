@@ -1,0 +1,44 @@
+{% extends './index.html' %}
+
+{% block body %}
+<div class="w-50" style="margin: 0 auto">
+        <form id="frmProducto" action="/editar"  method="POST" enctype="multipart/form-data" class="was-validated">
+            <div><h3 class="text-center fw-bold bg-success text-white">Editar producto</h3></div>
+            <input type="hidden" name="idProducto" value="{{ producto._id }}"> <!-- Hidden field for product ID -->
+            <div class="mb-3">
+                <label for="txtCodigo" class="fw-bold">Código:</label>
+                <input type="text" name="txtCodigo" id="txtCodigo" class="form-control" value="{{ producto.codigo }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtNombre" class="fw-bold">Nombre:</label>
+                <input type="text" name="txtNombre" id="txtNombre" class="form-control" value="{{ producto.nombre }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="txtPrecio" class="fw-bold">Precio:</label>
+                <input type="text" name="txtPrecio" id="txtPrecio" class="form-control" value="{{ producto.precio }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="cbCategoria" class="fw-bold">Categoría:</label>
+                <select name="cbCategoria" id="cbCategoria" class="form-control" required>
+                    {% for c in categorias %}
+                        {%if c.id==producto.categoria.id%}
+                            <option value="{{ c.id }}" selected>{{c.nombre }}</option>
+                        {%else%}
+                            <option value="{{c.id}}">{{c.nombre}}</option>
+                            
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="fw-bold" for="fileFoto">Foto(jpg):</label>
+                <input type="file" name="fileFoto" id="fileFoto" onchange="visualizarFoto(event)"  
+                class="form-control"  accept=".jpg" required >
+            </div>
+            <div class="mb-3 text-center">
+                <img id="imagenProducto" width="100" height="100">
+            </div>
+            <button type="submit" class="btn btn-primary">Actualizar</button>
+            <a href="/listarProductos"><button type="button" class="btn btn-warning">Cancelar</button></a>
+        </form>
+</div>
+{% endblock %}
