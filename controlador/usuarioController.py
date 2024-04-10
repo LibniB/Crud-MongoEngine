@@ -1,8 +1,9 @@
-from app import app, usuarios
+from app import app
 from flask import render_template, request, redirect, session, url_for
 import pymongo
 import yagmail
 import threading
+from models.model import * 
 
 @app.route('/')
 def vistaIniciarSesion():  
@@ -18,7 +19,9 @@ def iniciarSesion():
             password = request.form['txtPassword']
             datosConsulta = {"usuario": usuario, "password": password}
             print(datosConsulta)
-            user = usuarios.find_one(datosConsulta)
+            
+            user = usuarios.object(usuario = usuario, password=password).first()
+            
             if (user):
                 session['user']=usuario
                 email = yagmail.SMTP("libnibernate@gmail.com", open(".password").read(), encoding='UTF-8')

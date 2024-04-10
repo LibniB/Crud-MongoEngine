@@ -1,4 +1,4 @@
-from app import app, productos, categorias  
+
 from flask import Flask, render_template, request, jsonify,redirect, url_for,abort, session
 import pymongo
 import os
@@ -8,6 +8,10 @@ from PIL import Image
 from io import BytesIO
 from bson.json_util import dumps
 from flask_mongoengine import MongoEngine
+from models.model import productos,categorias
+from app import app 
+
+    
 
 @app.route('/listarProductos')
 def inicio():
