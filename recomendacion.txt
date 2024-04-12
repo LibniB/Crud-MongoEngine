@@ -1,0 +1,2 @@
+Para poder correr el proyecto se instalaran las librerias que están en requirements.txt, incluyendo flask-mongoengine. 
+Para que no haya ningun problema primero desintala flask-mongoengine (pip uninstall flask-mongoengine) y luego vuleve a instalarla así: pip install git+https://github.com/idoshr/flask-mongoengine.git@1.0.1
