@@ -20,7 +20,7 @@ def iniciarSesion():
             datosConsulta = {"usuario": usuario, "password": password}
             print(datosConsulta)
             
-            user = usuarios.object(usuario = usuario, password=password).first()
+            user = usuarios.objects(usuario = usuario, password=password).first()
             
             if (user):
                 session['user']=usuario
@@ -59,20 +59,20 @@ def registro():
         correo = request.form['txtCorreo']
 
         # Verificar si el usuario ya existe en la base de datos
-        if usuarios.find_one({"usuario": usuario}):
+        if usuarios.objects(usuario=usuario).first():
             return "El usuario ya está registrado"
 
         # Crear un nuevo documento de usuario
-        nuevo_usuario = {
-            "usuario": usuario,
-            "password": password,
-            "nombres": nombres,
-            "apellidos": apellidos,
-            "correo": correo
-        }
+        nuevo_usuario = usuarios(
+            usuario=usuario,
+            password=password,
+            nombres=nombres,
+            apellidos=apellidos,
+            correo=correo
+        )
 
-        # Insertar el nuevo usuario en la base de datos
-        usuarios.insert_one(nuevo_usuario)
+        # Guardar el nuevo usuario en la base de datos
+        nuevo_usuario.save()
 
         # Redirigir al usuario a la página de inicio de sesión después del registro exitoso
         return redirect(url_for('vistaIniciarSesion'))

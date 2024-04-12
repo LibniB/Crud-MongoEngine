@@ -5,7 +5,7 @@ class usuarios(Document):
     password=StringField(max_length=50)
     nombres=StringField(max_length=50)
     apellidos=StringField(max_length=50)
-    correo= EmailField(required=True,unique=True)
+    correo= EmailField(required=True)
 
 class categorias(Document):
     nombre=StringField(max_length=50,unique=True)
@@ -16,5 +16,3 @@ class productos(Document):
     precio=IntField()
     categoria= ReferenceField(categorias)
 
-productos= productos.objects()
-print(productos)

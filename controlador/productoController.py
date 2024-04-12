@@ -9,56 +9,56 @@ from io import BytesIO
 from bson.json_util import dumps
 from flask_mongoengine import MongoEngine
 from models.model import productos,categorias
+
 from app import app 
 
     
 
 @app.route('/listarProductos')
 def inicio():
-    if("user" in session):
-        listaProductos = productos.objects()   
-        return render_template('listarProductos.html', productos=listaProductos)
+    if "user" in session:
+        try:
+            listaProductos = productos.objects()  # Consulta la base de datos para obtener todos los productos
+            return render_template('listarProductos.html', productos=listaProductos)
+        except Exception as error:
+            mensaje = 'Error al cargar la lista de productos: {}'.format(error)
+            return render_template('error.html', mensaje=mensaje)
     else:
-        mensaje="Debe primero iniciar sesion"
+        mensaje = "Debe primero iniciar sesión"
         return render_template("frmIniciarSesion.html", mensaje=mensaje)
 
 @app.route('/agregarProducto', methods=['POST'])  
 def agregarProducto():
-    if("user" in session):
-            mensaje = None
-            estado = False
-            try:
-                codigo = int(request.form['txtCodigo'])
-                nombre = request.form['txtNombre']
-                precio = int(request.form['txtPrecio'])
-                idCategoria = ObjectId(request.form['cbCategoria'])
-                foto = request.files['fileFoto'] 
-                producto = {
-                    "codigo": codigo,
-                    "nombre": nombre,
-                    "precio": precio,
-                    "categoria": idCategoria,
-                }
-                resultado = productos.insert_one(producto)
-                if (resultado.acknowledged):
-                    idProducto = resultado.inserted_id  
-                    nombreFoto = f'{idProducto}.jpg'
-                    foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombreFoto))
-                    mensaje = 'Producto agregado correctamente'
-                    estado = True
-                    return render_template('listarProductos.html')
-                else:
-                    mensaje = 'No se pudo agregar el producto'
-                    return mensaje
-                
-            except pymongo.errors as error: 
-                mensaje = error
-                return error
+    if "user" in session:
+        try:
+            codigo = int(request.form['txtCodigo'])
+            nombre = request.form['txtNombre']
+            precio = int(request.form['txtPrecio'])
+            idCategoria = ObjectId(request.form['cbCategoria'])
+            foto = request.files['fileFoto'] 
+            producto_data = {
+                "codigo": codigo,
+                "nombre": nombre,
+                "precio": precio,
+                "categoria": idCategoria,
+            }
+            producto = productos(**producto_data)  # Crea un nuevo documento de productos
+            producto.save()  # Guarda el nuevo producto en la base de datos
+            if producto:
+                idProducto = producto.id  # Obtiene el ID del producto insertado
+                nombreFoto = f'{idProducto}.jpg'
+                foto.save(os.path.join(app.config['UPLOAD_FOLDER'], nombreFoto))
+                mensaje = 'Producto agregado correctamente'
+                return render_template('listarProductos.html', mensaje=mensaje)
+            else:
+                mensaje = 'No se pudo agregar el producto'
+                return render_template('error.html', mensaje=mensaje)
+        except Exception as error: 
+            mensaje = 'Error al agregar el producto: {}'.format(error)
+            return render_template('error.html', mensaje=mensaje)
     else:
         mensaje="Debe primero iniciar sesion"
         return render_template("frmIniciarSesion.html", mensaje=mensaje)
-
-
     
 @app.route('/vistaAgregarProducto')
 def vistaAgregarProducto():
@@ -76,13 +76,18 @@ def vistaAgregarProducto():
 def eliminar_producto(idProducto):
     if ("user" in session):
         try:
-            resultado = productos.delete_one({"_id": ObjectId(idProducto)})
-            if resultado.deleted_count == 1:
+            # Obtener el producto por su ID
+            producto = productos.objects(id=idProducto).first()
+            
+            # Verificar si el producto existe
+            if producto:
+                # Eliminar el producto
+                producto.delete()
                 print ('Entra condicion eliminar')
                 return redirect(url_for("inicio"))  
             else:
                 return "Producto no encontrado."
-        except pymongo.errors.PyMongoError as error:
+        except Exception as error:
             return f"Error al eliminar el producto: {error}"
     else:
         mensaje="Debe primero iniciar sesion"
@@ -90,21 +95,19 @@ def eliminar_producto(idProducto):
 
 
 
-
 @app.route('/editarProducto/<idProducto>', methods=['GET'])
 def vistaEditarProducto(idProducto):
-    if ("user" in session):
+    if "user" in session:
         try:
-        
-            producto = productos.find_one({"_id": ObjectId(idProducto)})
-            if producto is None:
-                abort(404)  
-            listaCategorias = categorias.find()
-            return render_template('frmEditarProducto.html', producto=producto, categorias=listaCategorias)
+            producto = productos.objects.get(id=idProducto)
+            listaCategorias = categorias.objects()
+            return render_template('frmEditarProducto.html', producto=producto, categorias=listaCategorias, idProducto=idProducto)
+        except productos.DoesNotExist:
+            abort(404)
         except Exception as e:
             return f"Error: {e}"
     else:
-        mensaje="Debe primero iniciar sesion"
+        mensaje = "Debe primero iniciar sesión"
         return render_template("frmIniciarSesion.html", mensaje=mensaje)
 
 
@@ -119,16 +122,17 @@ def editar():
             idCategoria = ObjectId(request.form['cbCategoria'])
             foto = request.files['fileFoto'] if 'fileFoto' in request.files else None
 
-            # Actualiza los datos del producto en la base de datos
-            productos.update_one(
-                {"_id": ObjectId(idProducto)},
-                {"$set": {
-                    "codigo": codigo,
-                    "nombre": nombre,
-                    "precio": precio,
-                    "categoria": idCategoria
-                }}
-            )
+            # Obtener el producto a editar
+            producto = productos.objects.get(id=idProducto)
+
+            # Actualizar los campos del producto
+            producto.codigo = codigo
+            producto.nombre = nombre
+            producto.precio = precio
+            producto.categoria = idCategoria
+
+            # Guardar los cambios en la base de datos
+            producto.save()
 
             # Si se proporcionó una nueva foto, guarda la foto
             if foto:
@@ -142,3 +146,4 @@ def editar():
     else:
         mensaje="Debe primero iniciar sesion"
         return render_template("frmIniciarSesion.html", mensaje=mensaje)
+

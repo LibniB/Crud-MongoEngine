@@ -17,4 +17,5 @@ db = MongoEngine(app)
 if __name__ == '__main__':   
     from controlador.productoController import * 
     from controlador.usuarioController import *
+    from models.model import *
     app.run(port=5000, host='0.0.0.0', debug=True)
